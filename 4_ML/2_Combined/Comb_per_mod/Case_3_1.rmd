@@ -1,0 +1,231 @@
+---
+title: "MachineLearningAlpha"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+```
+
+```{r}
+rm(list=ls())
+library(tidyverse)
+library(reticulate)
+library(matrixStats)
+use_condaenv("py3.8", required = TRUE)
+#use_condaenv("r4.4_env", required = TRUE)
+py_config()
+```
+
+
+
+
+```{python}
+import pickle
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+
+# Define the folder names
+folders = ['imgbest', 'bestmodel']
+
+# Create the folders if they don't exist
+for folder in folders:
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+        print(f"Folder '{folder}' created.")
+    else:
+        print(f"Folder '{folder}' already exists.")
+
+
+```
+
+```{python}
+import matplotlib.pyplot as plt
+plt.rcParams['figure.dpi']= 1200
+plt.rcParams['savefig.dpi'] = 1200
+```
+
+
+```{python}
+# List of all model IDs
+model_ids = [
+  'xgboost', 'catboost', 'ada',  'dt', 'et', 'gbc', 'knn', 'lda',
+    'lightgbm', 'lr', 'nb', 'qda', 'rf', 'ridge', 'svm' 
+]
+
+
+
+# List of models to train
+#model_ids = ['lr', 'knn', 'nb','xgboost','catboost']
+
+
+colors = ["#4E79A7", "#A0CBE8","#F28E2B", "#FFBE7D", "#59A14F", "#8CD17D","#B6992D","#F1CE63","#499894","#86BCB6",
+      "#E15759","#FF9D9A","#79706E","#BAB0AC","#D37295", "#FABFD2", "#B07AA1","#D4A6C8", "#9D7660","#D7B5A6"]
+
+```
+
+
+```{python}
+# Set random seed for reproducibility
+np.random.seed(42)
+
+
+# Load workspace variables from the file
+with open("../output_pickles/all_alpha_beta_integrated_expr_labeled_interleaved_shuffled/all_alpha_beta_integrated_expr_labeled_interleaved_shuffled.pkl", "rb") as file:
+    combined_data = pickle.load(file)
+    
+# Combine both datasets into one (train + test)
+#combined_data = workspace_data
+rows, col =combined_data.shape
+
+```
+
+
+```{python}
+from pycaret.classification import *
+data = pd.DataFrame(combined_data)
+data= data.rename(columns={'output': 'target'})
+data.head()
+
+
+```
+
+
+```{python}
+from pycaret.classification import pull, create_model, save_model, setup
+import pandas as pd
+import os
+
+# Set up PyCaret
+clf = setup(
+    data=data,  # Replace with your actual dataset
+    target='target',  # Replace with your actual target column
+    fix_imbalance=True,feature_selection=True,n_features_to_select=50,
+    fix_imbalance_method="SMOTE",
+    train_size=0.8,n_jobs=40,
+    session_id=123
+)
+
+X_test = get_config('X_test')
+y_test = get_config('y_test')
+
+X_train = get_config('X_train')
+y_train = get_config('y_train')
+
+
+
+```
+
+
+```{python}
+import os
+import gc
+import pandas as pd
+from pycaret.classification import create_model, pull, save_model
+
+# Ensure directory exists
+os.makedirs("bestmodel", exist_ok=True)
+
+# Excel writer setup
+excel_file = os.path.abspath("model_metrics_complete.xlsx")
+writer = pd.ExcelWriter(excel_file, engine='xlsxwriter')
+results_df = pd.DataFrame()
+
+# === Helper Function ===
+def process_model(model_id):
+    print(f"🔧 Starting model: {model_id} ...")
+    model = create_model(model_id)
+    result = pull()
+
+    # Filter numeric rows
+    result = result[result.index.to_series().apply(lambda x: str(x).isdigit())].copy()
+    result['Model'] = model_id
+
+    # Add Mean and Std
+    mean_row = result.mean(numeric_only=True).to_frame().T
+    std_row = result.std(numeric_only=True).to_frame().T
+    mean_row['Model'] = 'Mean'
+    std_row['Model'] = 'Std'
+    result_with_summary = pd.concat([result, mean_row, std_row], ignore_index=True)
+
+    # Save to Excel sheet
+    result_with_summary.to_excel(writer, sheet_name=model_id, index=False)
+
+    # Save model
+    model_path = os.path.abspath(f"bestmodel/{model_id}_model.pkl")
+    save_model(model, model_path)
+    print(f"✅ {model_id} complete. Model saved at:\n{model_path}")
+    print("------------------------------------------------------------")
+
+    return result
+
+# === Model Execution ===
+
+result_ada = process_model('ada')
+print("✅ ada is complete. Starting catboost...")
+gc.collect()
+result_catboost = process_model('catboost')
+print("✅ catboost is complete. Starting dt...")
+gc.collect()
+result_dt = process_model('dt')
+print("✅ dt is complete. Starting et...")
+gc.collect()
+result_et = process_model('et')
+print("✅ et is complete. Starting gbc...")
+gc.collect()
+result_gbc = process_model('gbc')
+print("✅ gbc is complete. Starting knn...")
+gc.collect()
+result_knn = process_model('knn')
+print("✅ knn is complete. Starting lda...")
+gc.collect()
+result_lda = process_model('lda')
+print("✅ lda is complete. Starting lightgbm...")
+gc.collect()
+result_lightgbm = process_model('lightgbm')
+print("✅ lightgbm is complete. Starting lr...")
+gc.collect()
+result_lr = process_model('lr')
+print("✅ lr is complete. Starting nb...")
+gc.collect()
+result_nb = process_model('nb')
+print("✅ nb is complete. Starting qda...")
+gc.collect()
+result_qda = process_model('qda')
+print("✅ qda is complete. Starting rf...")
+gc.collect()
+result_rf = process_model('rf')
+print("✅ rf is complete. Starting ridge...")
+gc.collect()
+result_ridge = process_model('ridge')
+print("✅ ridge is complete. Starting svm...")
+gc.collect()
+result_svm = process_model('svm')
+print("✅ svm is complete. Starting xgboost...")
+gc.collect()
+result_xgboost = process_model('xgboost')
+print("✅ xgboost is complete. All models processed!")
+
+# === Final Summary Sheet ===
+# Combine results for summary
+all_results = pd.concat([
+    result_ada, result_catboost, result_dt, result_et, result_gbc,
+    result_knn, result_lda, result_lightgbm, result_lr, result_nb,
+    result_qda, result_rf, result_ridge, result_svm, result_xgboost
+], ignore_index=True)
+
+summary = all_results.groupby('Model').mean(numeric_only=True).reset_index()
+summary.to_excel(writer, sheet_name='Model_Summary', index=False)
+
+writer.close()
+
+print(f"\n📊 All model metrics written to Excel at:\n{excel_file}")
+print("✅✅✅ All models completed and results saved.")
+
+```

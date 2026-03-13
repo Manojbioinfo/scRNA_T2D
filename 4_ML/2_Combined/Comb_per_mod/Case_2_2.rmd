@@ -1,0 +1,181 @@
+---
+title: "MachineLearningAlpha"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+```
+
+```{r}
+rm(list=ls())
+library(tidyverse)
+library(reticulate)
+library(matrixStats)
+use_condaenv("py3.8", required = TRUE)
+#use_condaenv("r4.4_env", required = TRUE)
+py_config()
+```
+
+
+
+
+```{python}
+import pickle
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+
+# Define the folder names
+folders = ['imgbest', 'bestmodel']
+
+# Create the folders if they don't exist
+for folder in folders:
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+        print(f"Folder '{folder}' created.")
+    else:
+        print(f"Folder '{folder}' already exists.")
+
+
+```
+
+```{python}
+import matplotlib.pyplot as plt
+plt.rcParams['figure.dpi']= 1200
+plt.rcParams['savefig.dpi'] = 1200
+```
+
+
+```{python}
+# List of all model IDs
+model_ids = [
+    'ada', 'catboost', 'dt', 'et', 'gbc', 'knn', 'lda',
+    'lightgbm', 'lr', 'nb', 'qda', 'rf', 'ridge', 'svm', 'xgboost'
+]
+
+
+
+# List of models to train
+#model_ids = ['lr', 'knn', 'nb','xgboost','catboost']
+
+
+colors = ["#4E79A7", "#A0CBE8","#F28E2B", "#FFBE7D", "#59A14F", "#8CD17D","#B6992D","#F1CE63","#499894","#86BCB6",
+      "#E15759","#FF9D9A","#79706E","#BAB0AC","#D37295", "#FABFD2", "#B07AA1","#D4A6C8", "#9D7660","#D7B5A6"]
+
+```
+
+
+```{python}
+# Set random seed for reproducibility
+np.random.seed(42)
+
+
+# Load workspace variables from the file
+with open("../output_pickles/all_beta_integrated_expr_labeled_interleaved_shuffled/all_beta_integrated_expr_labeled_interleaved_shuffled.pkl", "rb") as file:
+    workspace_data = pickle.load(file)
+
+    
+# Combine both datasets into one (train + test)
+combined_data = workspace_data
+rows, col =combined_data.shape
+
+```
+
+
+```{python}
+from pycaret.classification import *
+data = pd.DataFrame(combined_data)
+data= data.rename(columns={'output': 'target'})
+data.head()
+
+
+```
+
+
+```{python}
+from pycaret.classification import pull, create_model, save_model, setup
+import pandas as pd
+import os
+
+# Set up PyCaret
+clf = setup(
+    data=data,  # Replace with your actual dataset
+    target='target',  # Replace with your actual target column
+    fix_imbalance=True,feature_selection=True,n_features_to_select=50,
+    fix_imbalance_method="SMOTE",
+    normalize= True, n_jobs=40,
+    train_size=0.8,
+    session_id=123
+)
+
+X_test = get_config('X_test')
+y_test = get_config('y_test')
+
+X_train = get_config('X_train')
+y_train = get_config('y_train')
+
+
+
+```
+
+
+```{python}
+# Prepare the Excel writer
+excel_file = "model_metrics_complete.xlsx"
+with pd.ExcelWriter(excel_file, engine='xlsxwriter') as writer:
+    
+    # DataFrame to store all model metrics for the summary file
+    results_df = pd.DataFrame()
+
+    # Train each model and pull performance metrics
+    for model_id in model_ids:
+        try:
+            print(f"Training {model_id}...")
+            
+            model = create_model(model_id)
+            result = pull()  # Get cross-validation metrics
+            
+            # Filter out summary rows (e.g., "Mean", "Std")
+            result = result[result.index.to_series().apply(lambda x: str(x).isdigit())].copy()
+            
+            # Add the model name as a column
+            result['Model'] = model_id
+            
+            # Calculate Mean and Std
+            mean_row = result.mean(numeric_only=True).to_frame().T
+            std_row = result.std(numeric_only=True).to_frame().T
+            
+            # Add the "Mean" and "Std" rows
+            mean_row['Model'] = 'Mean'
+            std_row['Model'] = 'Std'
+            
+            # Append Mean and Std to the original result
+            result_with_summary = pd.concat([result, mean_row, std_row], ignore_index=True)
+            
+            # Save the results for each model in a separate sheet
+            result_with_summary.to_excel(writer, sheet_name=model_id, index=True)
+
+            # Add to results_df for the summary file
+            results_df = pd.concat([results_df, result], ignore_index=True)
+
+            # Save the model
+            save_model(model, f"bestmodel/{model_id}_model")
+            print(f"{model_id} model saved.")
+
+        except Exception as e:
+            print(f"Failed to train {model_id}: {str(e)}")
+
+    # Generate the summary (mean per model across all metrics)
+    summary = results_df.groupby('Model').mean(numeric_only=True).reset_index()
+
+    # Save the summary file in the same Excel file
+    summary.to_excel(writer, sheet_name='Model_Summary', index=False)
+
+    print("✅ Model results and summary saved to Excel!")
+```
