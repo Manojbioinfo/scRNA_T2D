@@ -5,7 +5,7 @@ All rights reserved.
 
 This repository contains code associated with the manuscript:
 "Integrative single-cell multi-omics and machine learning identify INS
-as a central regulator of β-cell function in type 2 diabetes in the gut".
+as a central regulator of β-cell function in type 2 diabetes".
 
 The code is provided for review purposes only.
 
