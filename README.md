@@ -7,7 +7,6 @@ This repository contains the code used in the manuscript:
 
 **“Integrative single-cell multi-omics and machine learning identify INS as a central regulator of β-cell function in type 2 diabetes.”**
 
-The study integrates **single-cell multi-omics data and machine learning approaches** to investigate molecular mechanisms underlying β-cell dysfunction in **type 2 diabetes (T2D)**, with a particular focus on the regulatory role of **INS**.
 
 ### Important Notice
 
