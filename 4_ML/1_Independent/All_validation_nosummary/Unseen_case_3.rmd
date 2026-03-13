@@ -1,0 +1,244 @@
+---
+title: "MachineLearningAlpha"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+```
+
+```{r}
+rm(list=ls())
+library(tidyverse)
+library(reticulate)
+library(matrixStats)
+use_condaenv("py3.8", required = TRUE)
+#use_condaenv("r4.4_env", required = TRUE)
+py_config()
+```
+
+
+```{python}
+# unseen_case_analysis.py
+
+# ----------------- Imports -----------------
+import os
+import pickle
+import joblib
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.image as mpimg
+
+from sklearn.metrics import (
+    roc_curve, auc, precision_recall_curve,
+    confusion_matrix
+)
+
+from pycaret.classification import (
+    load_model, predict_model, get_config,
+    pull, create_model, save_model, setup
+)
+
+# ----------------- Configs -----------------
+np.random.seed(42)
+plt.rcParams['figure.dpi'] = 1200
+plt.rcParams['savefig.dpi'] = 1200
+
+colors = [
+    "#4E79A7", "#A0CBE8", "#F28E2B", "#FFBE7D", "#59A14F", "#8CD17D",
+    "#B6992D", "#F1CE63", "#499894", "#86BCB6", "#E15759", "#FF9D9A",
+    "#79706E", "#BAB0AC", "#D37295"
+]
+
+model_ids = sorted([
+    'ada', 'catboost', 'dt', 'et', 'gbc', 'knn', 'lda',
+    'lightgbm', 'lr', 'nb', 'qda', 'rf', 'ridge', 'svm', 'xgboost'
+])
+
+# ----------------- Case Configs -----------------
+case_map = {
+    "Case_1_3": "alpha",
+    "Case_2_3": "beta",
+    "Case_3_3": "alpha_beta"
+}
+
+case_datasets = {
+    "alpha": "../output_pickles/dis_ab_alpha_expr_labeled/dis_ab_alpha_expr_labeled.pkl",
+    "beta": "../output_pickles/dis_ab_beta_expr_labeled/dis_ab_beta_expr_labeled.pkl",
+    "alpha_beta": "../output_pickles/dis_ab_alpha_beta_expr_labeled/dis_ab_alpha_beta_expr_labeled.pkl"
+}
+
+case_folders = ["../Case_1_3", "../Case_2_3", "../Case_3_3"]
+
+# Ensure 'Results' folder exists
+os.makedirs("Results", exist_ok=True)
+
+# ----------------- Loop Through Each Case -----------------
+for case_folder in case_folders:
+    case_name = os.path.basename(case_folder)  # e.g., Case_1_1
+    case_type = case_map[case_name]
+    dataset_path = case_datasets[case_type]
+
+    print(f"\n📂 Processing {case_name} ({case_type})")
+
+    with open(dataset_path, "rb") as f:
+        combined_data = pickle.load(f)
+
+    data = pd.DataFrame(combined_data).rename(columns={'output': 'target'})
+    folder=case_folder
+    # Create output folders relative to current directory
+    case_num = folder.split('/')[-1].replace('Case_', '')  # "1_1"
+    out_folder = f"Results/1_unseen_dis_output_{case_type}_{case_num}"
+    os.makedirs(out_folder, exist_ok=True)
+    img_folder = os.path.join(out_folder, 'imgbest')
+    curve_folder = os.path.join(out_folder, 'curve_data')
+    os.makedirs(img_folder, exist_ok=True)
+    os.makedirs(curve_folder, exist_ok=True)
+
+    # ----------------- Setup PyCaret -----------------
+    clf = setup(
+        data=data,
+        target='target',
+        fix_imbalance=True,
+        fix_imbalance_method="SMOTE",
+        train_size=0.8,
+        session_id=123,pca=True,
+        verbose=False, n_jobs=20
+    )
+
+    X_test = get_config('X_test')
+    y_test = get_config('y_test')
+
+    # ----------------- Identify Best Model -----------------
+    model_summary_path = os.path.join(case_folder, "model_metrics_complete.xlsx")
+    summary_df = pd.read_excel(model_summary_path, sheet_name="Model_Summary")
+    best_model_row = summary_df.sort_values(by=['AUC', 'Accuracy'], ascending=False).iloc[0]
+    best_model_name = best_model_row['Model']
+    print(f"📌 Best model: {best_model_name}")
+
+    # ----------------- ROC Curve -----------------
+    combined_roc_data = pd.DataFrame()
+    plt.figure(figsize=(10, 6))
+
+    for model_id, color in zip(model_ids, colors):
+        try:
+            model_path = os.path.join(case_folder, "bestmodel", f"{model_id}_model.pkl")
+            model = load_model(model_path)
+
+            try:
+                y_scores = model.predict_proba(X_test)[:, 1]
+            except AttributeError:
+                y_scores = model.decision_function(X_test)
+
+            fpr, tpr, _ = roc_curve(y_test, y_scores)
+            roc_auc = auc(fpr, tpr)
+            plt.plot(fpr, tpr, label=f'{model_id} (AUC = {roc_auc:.2f})', color=color)
+
+            df = pd.DataFrame({'FPR': fpr, 'TPR': tpr})
+            df['Model'] = model_id
+            df.to_excel(f"{curve_folder}/roc_curve_{model_id}.xlsx", index=False)
+            combined_roc_data = pd.concat([combined_roc_data, df], ignore_index=True)
+
+        except Exception as e:
+            print(f"⚠️ Skipping ROC for {model_id}: {e}")
+
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title(f'{case_name} - ROC Curve')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig(f"{img_folder}/combined_roc_curve.png", dpi=600)
+    plt.close()
+
+    combined_roc_data.to_excel(f"{curve_folder}/combined_roc_curve.xlsx", index=False)
+
+    # ----------------- Precision-Recall Curve -----------------
+    combined_pr_data = pd.DataFrame()
+    plt.figure(figsize=(10, 6))
+
+    for model_id, color in zip(model_ids, colors):
+        try:
+            model_path = os.path.join(case_folder, "bestmodel", f"{model_id}_model.pkl")
+            model = load_model(model_path)
+
+            try:
+                y_scores = model.predict_proba(X_test)[:, 1]
+            except AttributeError:
+                y_scores = model.decision_function(X_test)
+
+            precision, recall, _ = precision_recall_curve(y_test, y_scores)
+            pr_auc = auc(recall, precision)
+            plt.plot(recall, precision, label=f'{model_id} (PR AUC = {pr_auc:.2f})', color=color)
+
+            df = pd.DataFrame({'Recall': recall, 'Precision': precision})
+            df['Model'] = model_id
+            df.to_excel(f"{curve_folder}/precision_recall_{model_id}.xlsx", index=False)
+            combined_pr_data = pd.concat([combined_pr_data, df], ignore_index=True)
+
+        except Exception as e:
+            print(f"⚠️ Skipping PR for {model_id}: {e}")
+
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title(f'{case_name} - Precision-Recall Curve')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig(f"{img_folder}/combined_precision_recall_curve.png", dpi=600)
+    plt.close()
+
+    combined_pr_data.to_excel(f"{curve_folder}/combined_precision_recall.xlsx", index=False)
+
+    # ----------------- Confusion Matrices -----------------
+    num_cols = 3
+    num_rows = -(-len(model_ids) // num_cols)
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 5 * num_rows))
+    axes = axes.flatten()
+
+    for idx, model_id in enumerate(model_ids):
+        try:
+            model_path = os.path.join(case_folder, "bestmodel", f"{model_id}_model.pkl")
+            model = load_model(model_path)
+            y_pred = model.predict(X_test)
+            cm = confusion_matrix(y_test, y_pred)
+
+            plt.figure(figsize=(6, 5))
+            sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Class 0', 'Class 1'], yticklabels=['Class 0', 'Class 1'])
+            plt.title(f"{model_id} - Confusion Matrix")
+            plt.xlabel("Predicted")
+            plt.ylabel("True")
+            filename = f"{img_folder}/{model_id}_confusion_matrix.jpg"
+            plt.savefig(filename, dpi=600, format='jpg', bbox_inches='tight')
+            plt.close()
+
+            img = mpimg.imread(filename)
+            axes[idx].imshow(img)
+            axes[idx].axis('off')
+            axes[idx].set_title(model_id)
+
+        except Exception as e:
+            print(f"⚠️ Confusion matrix error for {model_id}: {e}")
+
+    # Remove empty axes
+    for j in range(idx + 1, len(axes)):
+        fig.delaxes(axes[j])
+
+    plt.tight_layout()
+    plt.savefig(f"{img_folder}/combined_confusion_matrices.jpg", dpi=600)
+    plt.close()
+
+    print(f"✅ {case_name} complete. Output saved to {out_folder}\n")
+
+print("🎯 All unseen case analyses complete.")
+
+```
+
+
