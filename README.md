@@ -18,10 +18,15 @@ This repository contains the **code and analysis workflows** accompanying the ma
 ## 📬 Contact & Permissions
 **Corresponding Author:**
 👤 **Dr. Manoj Kumar Gupta, Ph.D.**
-📧 **Email:** [mkgupta.bioinfo@gmail.com](mailto:mkgupta.bioinfo@gmail.com) | [gupta.manoj@mh-hannover.de](mailto:gupta.manoj@mh-hannover.de)
+
+📧 **Email:** [mkgupta.bioinfo@gmail.com](mailto:mkgupta.bioinfo@gmail.com) |[gupta.manoj@mh-hannover.de](mailto:gupta.manoj@mh-hannover.de)
+
 🏛 **Affiliation:**
+
 Hematology, Hemostasis, Oncology, and Stem Cell Transplantation
+
 Hannover Medical School
+
 Hannover, 30625, Germany
 
 **Co-Authors:**
