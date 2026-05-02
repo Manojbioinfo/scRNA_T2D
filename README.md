@@ -43,7 +43,7 @@ San Diego, CA 92037
 ## 📜 License & Copyright
 📄 **License:** [MIT License](LICENSE.md) 
 
-⚠️ **Copyright (c) 2026 
+⚠️ **Copyright (c) 2026**
 
 Manoj Kumar Gupta, Joachim Wolff, Ramakrishna Vadde, Ganji Purnachandra Nagaraju**
 
@@ -63,3 +63,4 @@ If you use this code in your research, please cite:
   year={2026},
   doi={10.XXX/XXXX} 
 }
+```
