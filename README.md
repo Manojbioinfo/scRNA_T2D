@@ -1,6 +1,6 @@
 # Integrative Single-Cell Multi-Omics and Machine Learning Identify INS as a Central Regulator of β-Cell Function in Type 2 Diabetes
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19987828.svg)](https://doi.org/10.5281/zenodo.19987828) 
 
 ## 📜 Overview
 This repository contains the **code and analysis workflows** accompanying the manuscript:
@@ -61,11 +61,4 @@ San Diego, CA 92037
 ## 📚 How to Cite
 If you use this code in your research, please cite:
 
-```bibtex
-@article{gupta2026ins,
-  title={Integrative single-cell multi-omics and machine learning identify INS as a central regulator of β-cell function in type 2 diabetes},
-  author={Gupta, Manoj Kumar, Wolff, Joachim ,  Vadde, Ramakrishna and Nagaraju, Ganji Purnachandra},
-  year={2026},
-  doi={10.XXX/XXXX} 
-}
-```
+Gupta, M. K., Wolff, J., Ramakrishna, V., & Nagaraju, G. P. (2026). Integrative Single-Cell Multi-Omics and Machine Learning Identify INS as a Central Regulator of β-Cell Function in Type 2 Diabetes (Version Version1). Zenodo. https://doi.org/10.5281/zenodo.19987828
