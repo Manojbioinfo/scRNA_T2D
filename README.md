@@ -1,48 +1,58 @@
-# README
+# Integrative Single-Cell Multi-Omics and Machine Learning Identify INS as a Central Regulator of β-Cell Function in Type 2 Diabetes
 
-## Integrative single-cell multi-omics and machine learning identify **INS** as a central regulator of β-cell function in type 2 diabetes 
-### Overview
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) *(Replace with Zenodo DOI after archiving)*
 
-This repository contains the code used in the manuscript:
+## 📜 Overview
+This repository contains the **code and analysis workflows** accompanying the manuscript:
 
-**“Integrative single-cell multi-omics and machine learning identify INS as a central regulator of β-cell function in type 2 diabetes.”**
+> **"Integrative single-cell multi-omics and machine learning identify INS as a central regulator of β-cell function in type 2 diabetes."**
 
+### 🔒 **Important Notice**
+⚠️ **This repository is provided for manuscript review purposes only.**
+- **Permission is required** before using, modifying, or redistributing any part of this code.
+- **For research use**, please contact the corresponding author.
+- **Unauthorized use is prohibited** without explicit consent.
 
-### Important Notice
+---
 
-This repository is **provided for manuscript review purposes only**.
-
-If you are interested in using or adapting the code for research purposes, **please contact the authors for permission before use**.
-
-### Authors
-
-**Manoj Kumar Gupta¹**, **Joachim Wolff¹**, **Ramakrishna Vadde²**, **Ganji Purnachandra Nagaraju³**
-
-### Affiliations
-
-¹ Hematology, Hemostasis, Oncology, and Stem Cell Transplantation
-Hannover Medical School
-Hannover, 30625, Germany
-
-² Department of Biotechnology and Bioinformatics
-Yogi Vemana University
-Kadapa, 516005, Andhra Pradesh, India
-
-³ Division of Hematology & Oncology, Heersink School of Medicine
-The University of Alabama at Birmingham
-Birmingham, AL 35233, USA
-
-### Corresponding Author
-
-**Dr. Manoj Kumar Gupta, Ph.D.**
+## 📬 Contact & Permissions
+**Corresponding Author:**
+👤 **Dr. Manoj Kumar Gupta, Ph.D.**
+📧 **Email:** [mkgupta.bioinfo@gmail.com](mailto:mkgupta.bioinfo@gmail.com) | [gupta.manoj@mh-hannover.de](mailto:gupta.manoj@mh-hannover.de)
+🏛 **Affiliation:**
 Hematology, Hemostasis, Oncology, and Stem Cell Transplantation
 Hannover Medical School
 Hannover, 30625, Germany
 
-Email:
-[mkgupta.bioinfo@gmail.com](mailto:mkgupta.bioinfo@gmail.com)
-[gupta.manoj@mh-hannover.de](mailto:gupta.manoj@mh-hannover.de)
+**Co-Authors:**
+- Joachim Wolff¹
+- Ramakrishna Vadde²
+- Ganji Purnachandra Nagaraju³
 
-### Disclaimer
+¹ Hannover Medical School, Germany
 
-The scripts and workflows included here accompany the manuscript submission and may be updated upon publication.
+² Yogi Vemana University, India
+
+³ University of Alabama at Birmingham, USA
+
+---
+
+## 📜 License & Copyright
+📄 **License:** [MIT License](LICENSE.md) *(or choose GPL if preferred)*
+⚠️ **Copyright (c) 2026 Manoj Kumar Gupta, Joachim Wolff, Ramakrishna Vadde, Ganji Purnachandra Nagaraju**
+- **All rights reserved.**
+- **Redistribution or use in source or binary forms requires prior written permission.**
+
+---
+
+## 📚 How to Cite
+If you use this code in your research, please cite:
+
+```bibtex
+@article{gupta2026ins,
+  title={Integrative single-cell multi-omics and machine learning identify INS as a central regulator of β-cell function in type 2 diabetes},
+  author={Gupta, Manoj Kumar and Wolff, Joachim and Vadde, Ramakrishna and Nagaraju, Ganji Purnachandra},
+  journal={*Journal Name*},
+  year={2026},
+  doi={10.XXX/XXXX} *(Add DOI after publication)*
+}
