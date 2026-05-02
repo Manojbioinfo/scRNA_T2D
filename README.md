@@ -64,7 +64,7 @@ If you use this code in your research, please cite:
 ```bibtex
 @article{gupta2026ins,
   title={Integrative single-cell multi-omics and machine learning identify INS as a central regulator of β-cell function in type 2 diabetes},
-  author={Gupta, Manoj Kumar and Wolff, Joachim and Vadde, Ramakrishna and Nagaraju, Ganji Purnachandra},
+  author={Gupta, Manoj Kumar, Wolff, Joachim ,  Vadde, Ramakrishna and Nagaraju, Ganji Purnachandra},
   year={2026},
   doi={10.XXX/XXXX} 
 }
