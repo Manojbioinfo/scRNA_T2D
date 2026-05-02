@@ -1,6 +1,6 @@
 # Integrative Single-Cell Multi-Omics and Machine Learning Identify INS as a Central Regulator of β-Cell Function in Type 2 Diabetes
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) *(Replace with Zenodo DOI after archiving)*
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) 
 
 ## 📜 Overview
 This repository contains the **code and analysis workflows** accompanying the manuscript:
@@ -33,7 +33,10 @@ Hannover, 30625, Germany
 
 ² Yogi Vemana University, India
 
-³ University of Alabama at Birmingham, USA
+³ Division of medical Oncology,
+Moores Cancer Center
+University of California
+San Diego, CA 92037
 
 ---
 
@@ -52,7 +55,6 @@ If you use this code in your research, please cite:
 @article{gupta2026ins,
   title={Integrative single-cell multi-omics and machine learning identify INS as a central regulator of β-cell function in type 2 diabetes},
   author={Gupta, Manoj Kumar and Wolff, Joachim and Vadde, Ramakrishna and Nagaraju, Ganji Purnachandra},
-  journal={*Journal Name*},
   year={2026},
-  doi={10.XXX/XXXX} *(Add DOI after publication)*
+  doi={10.XXX/XXXX} 
 }
