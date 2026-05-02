@@ -41,11 +41,11 @@ San Diego, CA 92037
 ---
 
 ## 📜 License & Copyright
-📄 **License:** [MIT License](LICENSE.md) 
+📄 **License:**(LICENSE.md) 
 
 ⚠️ **Copyright (c) 2026**
 
-Manoj Kumar Gupta, Joachim Wolff, Ramakrishna Vadde, Ganji Purnachandra Nagaraju**
+**Manoj Kumar Gupta, Joachim Wolff, Ramakrishna Vadde, Ganji Purnachandra Nagaraju**
 
 - **All rights reserved.**
   
