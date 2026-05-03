@@ -17,6 +17,7 @@ save_plots <- function(plot_obj, filename_base) {
   jpeg(paste0(filename_base, ".jpeg"), width = 8 * 400, height = 6 * 400, res = 400)
   print(plot_obj)
   dev.off()
+  
 }
 
 
