@@ -5,7 +5,7 @@ library(tidyverse)
 library(patchwork)
 library(openxlsx)
 library(WGCNA)
-set.seed(134)
+set.seed(1364)
 rm(list=ls())
 
 # Save plot function
