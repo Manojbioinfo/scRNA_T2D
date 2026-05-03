@@ -71,6 +71,7 @@ plt.rcParams['savefig.dpi'] = 1200
 
 
 ```{python}
+
 # List of all model IDs
 model_ids = [
     'ada', 'catboost', 'dt', 'et', 'gbc', 'knn', 'lda',
